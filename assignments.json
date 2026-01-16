@@ -1,0 +1,12 @@
+{
+  "assignments": [
+    {
+      "id": 1,
+      "title": "Webbutveckling",
+      "questions": [
+        "Vad är HTML?",
+        "Vad är CSS?"
+      ]
+    }
+  ]
+}
