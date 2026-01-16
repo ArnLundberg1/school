@@ -13,9 +13,17 @@
   </div>
 
   <h2>Lärarpanel</h2>
-  <p>
-    Uppgifter skapas genom att redigera <b>assignments.json</b> i GitHub.
-  </p>
+  <p>Lägg till ny uppgift nedan:</p>
+
+  <input id="title" placeholder="Titel">
+  <textarea id="questions" placeholder="Skriv frågor separerade med ';'"></textarea>
+  <button onclick="addAssignment()">Lägg till uppgift</button>
+
+  <button onclick="downloadAssignments()">Ladda ner uppdaterad assignments.json</button>
+
+  <div id="currentAssignments">
+    <h3>Nuvarande uppgifter</h3>
+  </div>
 
   <script src="script.js"></script>
 </body>
