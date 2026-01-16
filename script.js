@@ -1,62 +1,88 @@
 let answers = {};
 
-// GEMENSAM LOGIN FÖR LÄRARE & ELEVER
+// LOGIN-KNAPP
+const loginBtn = document.getElementById("loginBtn");
+if (loginBtn) {
+  loginBtn.addEventListener("click", login);
+}
+
+// GEMENSAM LOGIN
 async function login() {
   const u = document.getElementById("user").value;
   const p = document.getElementById("pass").value;
+  const msg = document.getElementById("message");
 
-  // KOLLA LÄRARE
-  const tRes = await fetch("teachers.json");
-  const tData = await tRes.json();
-  const teacher = tData.teachers.find(
-    t => t.username === u && t.password === p
-  );
+  msg.innerText = "Kontrollerar inloggning...";
 
-  if (teacher) {
-    localStorage.setItem("role", "teacher");
-    localStorage.setItem("user", u);
-    location.href = "admin.html";
-    return;
-  }
+  try {
+    // KOLLA LÄRARE
+    const tRes = await fetch("teachers.json");
+    const tData = await tRes.json();
+    const teacher = tData.teachers.find(
+      t => t.username === u && t.password === p
+    );
 
-  // KOLLA ELEVER
-  const sRes = await fetch("students.json");
-  const sData = await sRes.json();
-  const student = sData.students.find(
-    s => s.username === u && s.password === p
-  );
+    if (teacher) {
+      localStorage.setItem("role", "teacher");
+      localStorage.setItem("user", u);
+      location.href = "admin.html";
+      return;
+    }
 
-  if (student) {
-    localStorage.setItem("role", "student");
-    localStorage.setItem("user", u);
-    location.href = "assignments.html";
-    return;
-  }
+    // KOLLA ELEVER
+    const sRes = await fetch("students.json");
+    const sData = await sRes.json();
+    const student = sData.students.find(
+      s => s.username === u && s.password === p
+    );
 
-  alert("Fel användarnamn eller lösenord");
-}
+    if (student) {
+      localStorage.setItem("role", "student");
+      localStorage.setItem("user", u);
+      location.href = "assignments.html";
+      return;
+    }
 
-// SKYDDA LÄRARSIDAN
-if (location.pathname.includes("admin.html")) {
-  if (localStorage.getItem("role") !== "teacher") {
-    location.href = "index.html";
-  }
-}
-
-// SKYDDA ELEVSIDAN
-if (location.pathname.includes("assignments.html")) {
-  if (localStorage.getItem("role") !== "student") {
-    location.href = "index.html";
+    msg.innerText = "Fel användarnamn eller lösenord";
+  } catch (e) {
+    msg.innerText = "Fel: sidan måste köras via GitHub Pages eller lokal server";
   }
 }
 
-// LADDA UPPGIFTER FÖR ELEVER
+// SKYDDA SIDOR
+const role = localStorage.getItem("role");
+const user = localStorage.getItem("user");
+
+if (location.pathname.includes("admin.html") && role !== "teacher") {
+  location.href = "index.html";
+}
+
+if (location.pathname.includes("assignments.html") && role !== "student") {
+  location.href = "index.html";
+}
+
+// VISUELL INDIKATOR
+const status = document.getElementById("status");
+if (status && user && role) {
+  status.innerText =
+    role === "teacher"
+      ? `Inloggad som lärare: ${user}`
+      : `Inloggad som elev: ${user}`;
+}
+
+// LOGGA UT
+function logout() {
+  localStorage.clear();
+  location.href = "index.html";
+}
+
+// LADDA UPPGIFTER
 async function loadAssignments() {
-  const res = await fetch("assignments.json");
-  const data = await res.json();
-
   const div = document.getElementById("assignments");
   if (!div) return;
+
+  const res = await fetch("assignments.json");
+  const data = await res.json();
 
   data.assignments.forEach(a => {
     div.innerHTML += `<h3>${a.title}</h3>`;
@@ -69,17 +95,13 @@ async function loadAssignments() {
   });
 }
 
-// SPARA SVAR I MINNET
 function saveAnswer(id, value) {
   answers[id] = value;
 }
 
-// LADDA NER SVAR SOM FIL
 function downloadAnswers() {
-  const student = localStorage.getItem("user");
-
   const file = {
-    student,
+    student: user,
     answers,
     created: new Date().toISOString()
   };
@@ -90,11 +112,10 @@ function downloadAnswers() {
 
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `${student}_svar.json`;
+  a.download = `${user}_svar.json`;
   a.click();
 }
 
-// AUTOLOAD
 if (document.getElementById("assignments")) {
   loadAssignments();
 }
