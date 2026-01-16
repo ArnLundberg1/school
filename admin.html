@@ -3,11 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <title>Lärarpanel</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <div class="top-bar">
+    <span id="status"></span>
+    <button onclick="logout()">Logga ut</button>
+  </div>
+
   <h2>Lärarpanel</h2>
   <p>
-    Uppgifter skapas genom att redigera <b>assignments.json</b> direkt i GitHub.
+    Uppgifter skapas genom att redigera <b>assignments.json</b> i GitHub.
   </p>
+
+  <script src="script.js"></script>
 </body>
 </html>
