@@ -74,8 +74,8 @@ const status = document.getElementById("status");
 if (status && user && role) {
   status.innerText =
     role === "teacher"
-      ? `Inloggad som lärare: ${user}`
-      : `Inloggad som elev: ${user}`;
+      ? `Inloggad som ${user}`
+      : `Inloggad som ${user}`;
 }
 
 // -----------------------
