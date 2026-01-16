@@ -3,10 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>Uppgifter</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <div class="top-bar">
+    <span id="status"></span>
+    <button onclick="logout()">Logga ut</button>
+  </div>
+
   <h1>Uppgifter</h1>
   <div id="assignments"></div>
+
   <button onclick="downloadAnswers()">Ladda ner svar</button>
 
   <script src="script.js"></script>
