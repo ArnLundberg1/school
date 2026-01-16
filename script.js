@@ -1,34 +1,63 @@
 let answers = {};
 
-// ELEVLOGIN
-async function studentLogin() {
+// GEMENSAM LOGIN FÖR LÄRARE & ELEVER
+async function login() {
   const u = document.getElementById("user").value;
   const p = document.getElementById("pass").value;
 
-  const res = await fetch("students.json");
-  const data = await res.json();
+  // KOLLA LÄRARE
+  const tRes = await fetch("teachers.json");
+  const tData = await tRes.json();
+  const teacher = tData.teachers.find(
+    t => t.username === u && t.password === p
+  );
 
-  const student = data.students.find(s => s.username === u && s.password === p);
-
-  if (student) {
-    localStorage.setItem("student", u);
-    location.href = "assignments.html";
-  } else {
-    alert("Fel användarnamn eller lösenord");
-  }
-}
-
-// LADDA UPPGIFTER
-async function loadAssignments() {
-  if (!localStorage.getItem("student")) {
-    location.href = "index.html";
+  if (teacher) {
+    localStorage.setItem("role", "teacher");
+    localStorage.setItem("user", u);
+    location.href = "admin.html";
     return;
   }
 
+  // KOLLA ELEVER
+  const sRes = await fetch("students.json");
+  const sData = await sRes.json();
+  const student = sData.students.find(
+    s => s.username === u && s.password === p
+  );
+
+  if (student) {
+    localStorage.setItem("role", "student");
+    localStorage.setItem("user", u);
+    location.href = "assignments.html";
+    return;
+  }
+
+  alert("Fel användarnamn eller lösenord");
+}
+
+// SKYDDA LÄRARSIDAN
+if (location.pathname.includes("admin.html")) {
+  if (localStorage.getItem("role") !== "teacher") {
+    location.href = "index.html";
+  }
+}
+
+// SKYDDA ELEVSIDAN
+if (location.pathname.includes("assignments.html")) {
+  if (localStorage.getItem("role") !== "student") {
+    location.href = "index.html";
+  }
+}
+
+// LADDA UPPGIFTER FÖR ELEVER
+async function loadAssignments() {
   const res = await fetch("assignments.json");
   const data = await res.json();
 
   const div = document.getElementById("assignments");
+  if (!div) return;
+
   data.assignments.forEach(a => {
     div.innerHTML += `<h3>${a.title}</h3>`;
     a.questions.forEach((q, i) => {
@@ -40,14 +69,14 @@ async function loadAssignments() {
   });
 }
 
-// SPARA SVAR (i minnet)
+// SPARA SVAR I MINNET
 function saveAnswer(id, value) {
   answers[id] = value;
 }
 
 // LADDA NER SVAR SOM FIL
 function downloadAnswers() {
-  const student = localStorage.getItem("student");
+  const student = localStorage.getItem("user");
 
   const file = {
     student,
